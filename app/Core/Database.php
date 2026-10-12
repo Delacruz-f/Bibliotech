@@ -19,7 +19,7 @@ final class Database
             $host = getenv('DB_HOST') ?: '127.0.0.1';
             $database = getenv('DB_NAME') ?: 'bdbibliotech';
             $username = getenv('DB_USER') ?: 'root';
-            $password = getenv('DB_PASSWORD') ?: '';
+            $password = getenv('DB_PASSWORD') ?: '12345678';
 
             $dsn = sprintf('mysql:host=%s;dbname=%s;charset=utf8mb4', $host, $database);
             self::$connection = new PDO($dsn, $username, $password, [
