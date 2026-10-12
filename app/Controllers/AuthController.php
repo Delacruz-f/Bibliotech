@@ -108,7 +108,7 @@ final class AuthController
 
         if (
             $nombre === ''
-            || strlen($nombre) > 150
+            || strlen($nombre) > 120
             || !is_string($email)
             || !is_string($password)
             || strlen($password) < 8
@@ -181,7 +181,7 @@ final class AuthController
             $this->redirect('/login');
         }
 
-        $this->redirect('/home');
+        $this->redirect($role === 'administrador' ? '/admin' : '/home');
     }
 
     private function redirect(string $path): void

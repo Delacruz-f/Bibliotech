@@ -28,7 +28,7 @@ $escape = static fn (string $value): string => htmlspecialchars($value, ENT_QUOT
         <form action="<?= $escape(Url::to('/register')) ?>" method="post">
             <input type="hidden" name="_csrf_token" value="<?= $escape($csrfToken) ?>">
             <label for="nombre">Nombre completo</label>
-            <input id="nombre" name="nombre" type="text" autocomplete="name" maxlength="150"
+            <input id="nombre" name="nombre" type="text" autocomplete="name" maxlength="120"
                    value="<?= $escape((string) $nombre) ?>" required>
 
             <label for="email">Correo electrónico</label>

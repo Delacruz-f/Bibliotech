@@ -27,6 +27,9 @@ $userName = is_array($_SESSION['user'] ?? null)
             <a class="nav-link" href="#catalogo">Catálogo</a>
             <a class="nav-link" href="#reservas">Mis reservas</a>
             <a class="nav-link" href="#multas">Mis multas</a>
+            <?php if (($_SESSION['user']['rol'] ?? '') === 'administrador'): ?>
+                <a class="nav-link" href="<?= $escape(Url::to('/admin')) ?>">Admin</a>
+            <?php endif; ?>
         </nav>
 
         <div class="account-actions">
