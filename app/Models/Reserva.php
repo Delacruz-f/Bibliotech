@@ -8,21 +8,23 @@ use PDO;
 
 final class Reserva
 {
-    private PDO $connection;
+    public const ESTADOS = ['pendiente', 'confirmada', 'expirada', 'cancelada'];
 
-    public function __construct(?PDO $connection = null)
+    private PDO $db;
+
+    public function __construct(?PDO $db = null)
     {
-        $this->connection = $connection ?? Database::connection();
+        $this->db = $db ?? Database::connection();
     }
 
     /** @return array<int, array<string, mixed>> */
     public function obtenerPorUsuario(int $id_usuario): array
     {
-        $expire = $this->connection->prepare(
+        $expire = $this->db->prepare(
             'UPDATE reservas
              SET estado = :nuevo_estado
              WHERE id_usuario = :id_usuario
-               AND LOWER(estado) = :estado_actual
+               AND estado = :estado_actual
                AND fecha_expiracion <= CURRENT_TIMESTAMP'
         );
         $expire->execute([
@@ -31,7 +33,7 @@ final class Reserva
             'estado_actual' => 'pendiente',
         ]);
 
-        $statement = $this->connection->prepare(
+        $statement = $this->db->prepare(
             'SELECT r.id, r.id_usuario, r.id_libro, r.fecha_reserva,
                     r.fecha_expiracion, r.estado,
                     l.titulo AS libro_titulo, l.autor AS libro_autor
@@ -47,40 +49,37 @@ final class Reserva
 
     public function crear(int $id_usuario, int $id_libro): bool
     {
-        $this->connection->beginTransaction();
+        $this->db->beginTransaction();
 
         try {
-            $book = $this->connection->prepare(
+            $book = $this->db->prepare(
                 'SELECT stock_disponible FROM libros WHERE id = :id_libro FOR UPDATE'
             );
             $book->execute(['id_libro' => $id_libro]);
             $stock = $book->fetchColumn();
 
             if ($stock === false || (int) $stock < 1) {
-                $this->connection->rollBack();
+                $this->db->rollBack();
                 return false;
             }
 
-            $expiry = (new \DateTimeImmutable('now'))
-                ->modify('+48 hours')
-                ->format('Y-m-d H:i:s');
-            $reservation = $this->connection->prepare(
-                'INSERT INTO reservas (id_usuario, id_libro, fecha_reserva, fecha_expiracion, estado)
-                 VALUES (:id_usuario, :id_libro, :fecha_reserva, :fecha_expiracion, :estado)'
+            $reservation = $this->db->prepare(
+                'INSERT INTO reservas
+                    (id_usuario, id_libro, fecha_reserva, fecha_expiracion, estado)
+                 VALUES
+                    (:id_usuario, :id_libro, NOW(), DATE_ADD(NOW(), INTERVAL 48 HOUR), :estado)'
             );
             $reservation->execute([
                 'id_usuario' => $id_usuario,
                 'id_libro' => $id_libro,
-                'fecha_reserva' => (new \DateTimeImmutable('now'))->format('Y-m-d H:i:s'),
-                'fecha_expiracion' => $expiry,
                 'estado' => 'pendiente',
             ]);
-            $this->connection->commit();
+            $this->db->commit();
 
             return true;
         } catch (\Throwable $exception) {
-            if ($this->connection->inTransaction()) {
-                $this->connection->rollBack();
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
             }
 
             throw $exception;
@@ -89,7 +88,7 @@ final class Reserva
 
     public function cancelar(int $id_usuario, int $id_reserva): bool
     {
-        $statement = $this->connection->prepare(
+        $statement = $this->db->prepare(
             'UPDATE reservas
              SET estado = :nuevo_estado
              WHERE id = :id_reserva
@@ -104,5 +103,62 @@ final class Reserva
         ]);
 
         return $statement->rowCount() > 0;
+    }
+
+    /** @return array{0: string, 1: array<string, mixed>} */
+    private function filtro(string $estado, string $busqueda): array
+    {
+        $like = '%' . $busqueda . '%';
+        $where = '(l.titulo LIKE :titulo OR u.nombre LIKE :nombre OR u.email LIKE :email)';
+        $params = ['titulo' => $like, 'nombre' => $like, 'email' => $like];
+        if (in_array($estado, self::ESTADOS, true)) {
+            $where .= ' AND r.estado = :estado';
+            $params['estado'] = $estado;
+        }
+
+        return [$where, $params];
+    }
+
+    public function contar(string $estado, string $busqueda): int
+    {
+        [$where, $params] = $this->filtro($estado, $busqueda);
+        $statement = $this->db->prepare(
+            "SELECT COUNT(*)
+             FROM reservas r
+             INNER JOIN libros l ON l.id = r.id_libro
+             INNER JOIN usuarios u ON u.id = r.id_usuario
+             WHERE $where"
+        );
+        $statement->execute($params);
+
+        return (int) $statement->fetchColumn();
+    }
+
+    /** @return list<array<string, mixed>> */
+    public function listar(string $estado, string $busqueda, int $limite, int $offset): array
+    {
+        [$where, $params] = $this->filtro($estado, $busqueda);
+        $statement = $this->db->prepare(
+            "SELECT r.id, r.fecha_reserva, r.fecha_expiracion, r.estado,
+                    l.titulo AS libro, l.stock_disponible,
+                    u.nombre AS usuario, u.email
+             FROM reservas r
+             INNER JOIN libros l ON l.id = r.id_libro
+             INNER JOIN usuarios u ON u.id = r.id_usuario
+             WHERE $where
+             ORDER BY (r.estado = 'pendiente') DESC, r.fecha_expiracion ASC, r.id DESC
+             LIMIT :limite OFFSET :desplazamiento"
+        );
+        $statement->bindValue(':titulo', '%' . $busqueda . '%');
+        $statement->bindValue(':nombre', '%' . $busqueda . '%');
+        $statement->bindValue(':email', '%' . $busqueda . '%');
+        if (in_array($estado, self::ESTADOS, true)) {
+            $statement->bindValue(':estado', $estado);
+        }
+        $statement->bindValue(':limite', max(1, $limite), PDO::PARAM_INT);
+        $statement->bindValue(':desplazamiento', max(0, $offset), PDO::PARAM_INT);
+        $statement->execute();
+
+        return $statement->fetchAll();
     }
 }

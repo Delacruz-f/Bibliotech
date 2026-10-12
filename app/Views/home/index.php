@@ -24,9 +24,14 @@ $userName = is_array($_SESSION['user'] ?? null)
 
         <nav class="main-nav" aria-label="Navegación principal">
             <a class="nav-link active" href="<?= $escape(Url::to('/home')) ?>" aria-current="page">Inicio</a>
-            <a class="nav-link" href="<?= $escape(Url::to('/catalogo')) ?>">Catálogo</a>
-            <a class="nav-link" href="<?= $escape(Url::to('/mis-reservas')) ?>">Mis reservas</a>
-            <a class="nav-link" href="<?= $escape(Url::to('/mis-multas')) ?>">Mis multas</a>
+            <?php if (($_SESSION['user']['rol'] ?? '') === 'estudiante'): ?>
+                <a class="nav-link" href="<?= $escape(Url::to('/catalogo')) ?>">Catálogo</a>
+                <a class="nav-link" href="<?= $escape(Url::to('/mis-reservas')) ?>">Mis reservas</a>
+                <a class="nav-link" href="<?= $escape(Url::to('/mis-multas')) ?>">Mis multas</a>
+            <?php endif; ?>
+            <?php if (($_SESSION['user']['rol'] ?? '') === 'administrador'): ?>
+                <a class="nav-link" href="<?= $escape(Url::to('/admin')) ?>">Admin</a>
+            <?php endif; ?>
         </nav>
 
         <div class="account-actions">

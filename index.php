@@ -22,6 +22,8 @@ spl_autoload_register(static function (string $class): void {
     }
 });
 
+date_default_timezone_set('America/Lima');
+
 $isHttps = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
 ini_set('session.use_strict_mode', '1');
 ini_set('session.use_only_cookies', '1');
@@ -37,7 +39,7 @@ session_start();
 header('X-Content-Type-Options: nosniff');
 header('X-Frame-Options: DENY');
 header('Referrer-Policy: strict-origin-when-cross-origin');
-header("Content-Security-Policy: default-src 'self'; style-src 'self'; form-action 'self'; base-uri 'self'; frame-ancestors 'none'");
+header("Content-Security-Policy: default-src 'self'; style-src 'self'; img-src 'self' https: data:; form-action 'self'; base-uri 'self'; frame-ancestors 'none'");
 
 $basePath = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/'));
 Url::setBasePath($basePath === '/' ? '' : rtrim($basePath, '/'));
@@ -55,7 +57,6 @@ $router->post('/login', [$auth, 'login']);
 $router->get('/register', [$auth, 'showRegister']);
 $router->post('/register', [$auth, 'register']);
 $router->post('/logout', [$auth, 'logout']);
-$router->get('/admin', static fn () => $dashboard->show('administrador'));
 $router->get('/bibliotecario', static fn () => $dashboard->show('bibliotecario'));
 $router->get('/home', [$dashboard, 'showHome']);
 $router->get('/catalogo', [$catalogo, 'index']);
@@ -64,6 +65,9 @@ $router->post('/reservas/crear', [$reservas, 'crear']);
 $router->post('/reservas/cancelar', [$reservas, 'cancelar']);
 $router->get('/mis-multas', [$multas, 'index']);
 $router->post('/mis-multas/pagar', [$multas, 'pagar']);
+
+// Módulo Administrador (dashboard, libros, categorías, usuarios, préstamos, reservas y multas).
+require __DIR__ . '/app/Routes/admin.php';
 
 try {
     $router->dispatch($_SERVER['REQUEST_METHOD'] ?? 'GET', $_SERVER['REQUEST_URI'] ?? '/');
