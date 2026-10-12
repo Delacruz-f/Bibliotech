@@ -176,18 +176,12 @@ final class AuthController
 
     private function redirectForRole(string $role): void
     {
-        $destinations = [
-            'administrador' => '/admin',
-            'bibliotecario' => '/bibliotecario',
-            'estudiante' => '/home',
-        ];
-
-        if (!isset($destinations[$role])) {
+        if (!in_array($role, ['administrador', 'bibliotecario', 'estudiante'], true)) {
             unset($_SESSION['user']);
             $this->redirect('/login');
         }
 
-        $this->redirect($destinations[$role]);
+        $this->redirect('/home');
     }
 
     private function redirect(string $path): void

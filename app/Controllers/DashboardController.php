@@ -35,6 +35,21 @@ final class DashboardController
         require dirname(__DIR__) . '/Views/dashboard.php';
     }
 
+    public function showHome(): void
+    {
+        $user = $_SESSION['user'] ?? null;
+        if (
+            !is_array($user)
+            || !isset($user['rol'])
+            || !in_array($user['rol'], ['administrador', 'bibliotecario', 'estudiante'], true)
+        ) {
+            $this->redirect('/login');
+        }
+
+        $csrfToken = Csrf::token();
+        require dirname(__DIR__) . '/Views/home/index.php';
+    }
+
     private function redirect(string $path): void
     {
         header('Location: ' . Url::to($path));

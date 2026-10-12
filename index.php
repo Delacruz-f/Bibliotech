@@ -51,7 +51,7 @@ $router->post('/register', [$auth, 'register']);
 $router->post('/logout', [$auth, 'logout']);
 $router->get('/admin', static fn () => $dashboard->show('administrador'));
 $router->get('/bibliotecario', static fn () => $dashboard->show('bibliotecario'));
-$router->get('/home', static fn () => $dashboard->show('estudiante'));
+$router->get('/home', [$dashboard, 'showHome']);
 
 try {
     $router->dispatch($_SERVER['REQUEST_METHOD'] ?? 'GET', $_SERVER['REQUEST_URI'] ?? '/');
