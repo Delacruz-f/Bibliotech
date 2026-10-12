@@ -2,7 +2,10 @@
 declare(strict_types=1);
 
 use App\Controllers\AuthController;
+use App\Controllers\CatalogoController;
 use App\Controllers\DashboardController;
+use App\Controllers\MultaController;
+use App\Controllers\ReservaController;
 use App\Core\Router;
 use App\Core\Url;
 
@@ -41,6 +44,9 @@ Url::setBasePath($basePath === '/' ? '' : rtrim($basePath, '/'));
 
 $auth = new AuthController();
 $dashboard = new DashboardController();
+$catalogo = new CatalogoController();
+$reservas = new ReservaController();
+$multas = new MultaController();
 $router = new Router();
 
 $router->get('/', [$auth, 'index']);
@@ -52,6 +58,12 @@ $router->post('/logout', [$auth, 'logout']);
 $router->get('/admin', static fn () => $dashboard->show('administrador'));
 $router->get('/bibliotecario', static fn () => $dashboard->show('bibliotecario'));
 $router->get('/home', [$dashboard, 'showHome']);
+$router->get('/catalogo', [$catalogo, 'index']);
+$router->get('/mis-reservas', [$reservas, 'index']);
+$router->post('/reservas/crear', [$reservas, 'crear']);
+$router->post('/reservas/cancelar', [$reservas, 'cancelar']);
+$router->get('/mis-multas', [$multas, 'index']);
+$router->post('/mis-multas/pagar', [$multas, 'pagar']);
 
 try {
     $router->dispatch($_SERVER['REQUEST_METHOD'] ?? 'GET', $_SERVER['REQUEST_URI'] ?? '/');

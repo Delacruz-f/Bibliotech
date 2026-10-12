@@ -24,9 +24,9 @@ $userName = is_array($_SESSION['user'] ?? null)
 
         <nav class="main-nav" aria-label="Navegación principal">
             <a class="nav-link active" href="<?= $escape(Url::to('/home')) ?>" aria-current="page">Inicio</a>
-            <a class="nav-link" href="#catalogo">Catálogo</a>
-            <a class="nav-link" href="#reservas">Mis reservas</a>
-            <a class="nav-link" href="#multas">Mis multas</a>
+            <a class="nav-link" href="<?= $escape(Url::to('/catalogo')) ?>">Catálogo</a>
+            <a class="nav-link" href="<?= $escape(Url::to('/mis-reservas')) ?>">Mis reservas</a>
+            <a class="nav-link" href="<?= $escape(Url::to('/mis-multas')) ?>">Mis multas</a>
         </nav>
 
         <div class="account-actions">
@@ -45,7 +45,7 @@ $userName = is_array($_SESSION['user'] ?? null)
             <p class="hero-kicker">Tu biblioteca, más cerca</p>
             <h1 id="hero-title">Plataforma <span>BiblioTech</span></h1>
             <p class="hero-subtitle">Solución tecnológica desarrollada sobre entorno LAMP.</p>
-            <a class="primary-button" href="#catalogo">Comenzar Ahora</a>
+            <a class="primary-button" href="<?= $escape(Url::to('/catalogo')) ?>">Comenzar Ahora</a>
         </div>
         <div class="hero-decoration" aria-hidden="true">
             <span class="decoration-orbit orbit-one"></span>
