@@ -101,6 +101,23 @@ final class Libro
         return $row === false ? null : $row;
     }
 
+    /** @return array<string, mixed>|null */
+    public function detalle(int $id): ?array
+    {
+        $statement = $this->db->prepare(
+            'SELECT l.id, l.titulo, l.autor, l.isbn, l.editorial, l.anio, l.portada_url,
+                    l.sinopsis, l.stock_total, l.stock_disponible,
+                    c.nombre AS categoria_nombre
+             FROM libros l
+             LEFT JOIN categorias c ON c.id = l.id_categoria
+             WHERE l.id = :id'
+        );
+        $statement->execute(['id' => $id]);
+        $row = $statement->fetch();
+
+        return $row === false ? null : $row;
+    }
+
     /** @return list<array<string, mixed>> */
     public function disponibles(): array
     {

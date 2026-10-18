@@ -133,6 +133,26 @@ td.adm-empty { padding: 28px 12px; }
 .span2 { grid-column: 1 / -1; }
 .adm-hint { margin: 0; color: var(--adm-muted); font-size: 0.9rem; }
 .adm-form-actions { display: flex; gap: 12px; margin-top: 4px; }
+.config-form { display: grid; width: 100%; gap: 0; padding: 26px 18px 18px; border: 1px solid #f0ece5; border-radius: 18px; background: #fff; box-shadow: 0 2px 14px rgb(60 30 55 / 8%); }
+.config-section { padding: 8px 0 16px; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+.config-section h2 { margin: 0 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--adm-line); color: var(--adm-purple); font-size: 1.1rem; }
+.config-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 22px; }
+.config-fields label { display: grid; gap: 7px; color: var(--adm-ink); font-size: 0.92rem; font-weight: 700; }
+.config-fields small { color: var(--adm-muted); font-size: 0.8rem; font-weight: 400; }
+.config-checkbox { display: flex; margin-top: 12px; align-items: flex-start; gap: 10px; color: var(--adm-ink); font-size: 0.92rem; font-weight: 600; }
+.config-checkbox span { display: grid; gap: 3px; }
+.config-checkbox small { color: var(--adm-muted); font-size: 0.8rem; font-weight: 400; }
+.config-checkbox input { width: 18px; min-width: 18px; min-height: 18px; margin: 0; padding: 0; border: 0; border-radius: 3px; accent-color: var(--adm-purple); }
+.config-actions { display: flex; padding: 16px 2px 0; border-top: 1px solid #f3f0ea; align-items: center; justify-content: flex-end; gap: 22px; }
+.config-actions > a { color: var(--adm-muted); font-weight: 600; text-decoration: none; }
+.config-actions > a:hover { color: var(--adm-purple); text-decoration: underline; }
+.config-save { min-height: 44px; padding: 0 22px; border: 0; color: var(--adm-purple-dark); background: var(--adm-gold); font-size: 0.92rem; }
+.config-save:hover { background: #e1ae3b; }
+.adm-alert-error { margin: 0 0 18px; padding: 12px 15px; border: 1px solid #f0c8ce; border-radius: 9px; color: #8d2938; background: #fff1f2; }
+body.adm-config { background: #fdfbf0; }
+.config-section h2 { color: #6b2c5f; }
+.config-save { color: #51214b; background: #d9a02b; }
+.config-save:hover { background: #e4ad38; }
 input, select, textarea { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid #ddd5db; border-radius: 10px; color: var(--adm-ink); background: #fff; font: inherit; font-weight: 400; }
 textarea { resize: vertical; }
 input:focus, select:focus, textarea:focus { border-color: var(--adm-purple); outline: 3px solid rgb(111 36 89 / 14%); }
@@ -167,6 +187,7 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--adm-gold); outl
 }
 @media (max-width: 680px) {
     .adm-cards, .adm-two, .adm-form { grid-template-columns: 1fr; }
+    .config-fields { grid-template-columns: 1fr; }
     .adm-title { font-size: 1.7rem; }
     .adm-form { padding: 20px; }
 }

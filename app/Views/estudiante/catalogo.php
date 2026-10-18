@@ -47,6 +47,7 @@ $libros = $pageData['libros'];
                 $author = (string) ($libro['autor'] ?? 'Autor no especificado');
                 $category = (string) ($libro['categoria_nombre'] ?? 'Sin categoría');
                 $cover = trim((string) ($libro['portada_url'] ?? ''));
+                $detailsUrl = Url::to('/catalogo/show?id=' . $bookId);
                 ?>
                 <article class="book-card" id="libro-<?= $bookId ?>">
                     <div class="book-cover">
@@ -63,16 +64,15 @@ $libros = $pageData['libros'];
                         <h2><?= $escape($title) ?></h2>
                         <p class="book-author"><?= $escape($author) ?></p>
                         <p class="book-category"><?= $escape($category) ?></p>
-                        <details class="book-details">
-                            <summary>Ver detalle <span aria-hidden="true">→</span></summary>
-                            <p><?= $available ? 'Disponible para reservar.' : 'Actualmente no hay ejemplares disponibles.' ?></p>
-                        </details>
-                        <?php if ($available): ?>
+                        <a class="book-details" href="<?= $escape($detailsUrl) ?>">Ver libro <span aria-hidden="true">→</span></a>
+                        <?php if ($canReserve && $available): ?>
                             <form class="reserve-form" action="<?= $escape(Url::to('/reservas/crear')) ?>" method="post">
                                 <input type="hidden" name="_csrf_token" value="<?= $escape($csrfToken) ?>">
                                 <input type="hidden" name="id_libro" value="<?= $bookId ?>">
                                 <button class="button button-small" type="submit">Reservar libro</button>
                             </form>
+                        <?php elseif (!$canReserve): ?>
+                            <p class="reservation-hint">Inicia sesión como estudiante para reservar.</p>
                         <?php endif; ?>
                     </div>
                 </article>

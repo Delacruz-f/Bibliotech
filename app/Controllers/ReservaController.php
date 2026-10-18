@@ -6,7 +6,9 @@ namespace App\Controllers;
 use App\Core\Csrf;
 use App\Core\Flash;
 use App\Core\Url;
+use App\Models\Configuracion;
 use App\Models\Reserva;
+use DomainException;
 
 final class ReservaController
 {
@@ -34,10 +36,15 @@ final class ReservaController
             $this->redirect('/catalogo');
         }
 
-        if ((new Reserva())->crear($idUsuario, $idLibro)) {
-            Flash::set(['success' => 'Reserva creada. Tienes 48 horas para retirarla.']);
-        } else {
-            Flash::set(['error' => 'El libro ya no está disponible para reservar.']);
+        try {
+            if ((new Reserva())->crear($idUsuario, $idLibro)) {
+                $configuracion = (new Configuracion())->obtenerTodas();
+                Flash::set(['success' => 'Reserva creada. Tienes ' . $configuracion['horas_vigencia_reserva'] . ' horas para retirarla.']);
+            } else {
+                Flash::set(['error' => 'El libro ya no está disponible para reservar.']);
+            }
+        } catch (DomainException $exception) {
+            Flash::set(['error' => $exception->getMessage()]);
         }
 
         $this->redirect('/mis-reservas');

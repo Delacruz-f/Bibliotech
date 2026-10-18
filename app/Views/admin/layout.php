@@ -15,8 +15,9 @@ $menu = [
     'libros' => ['Libros', '/admin/libros'],
     'categorias' => ['Categorías', '/admin/categorias'],
     'usuarios' => ['Usuarios', '/admin/usuarios'],
-    'prestamos' => ['Préstamos', '/admin/prestamos'],
+    'configuracion' => ['Configuración', '/admin/configuracion'],
     'reservas' => ['Reservas', '/admin/reservas'],
+    'prestamos' => ['Préstamos', '/admin/prestamos'],
     'multas' => ['Multas', '/admin/multas'],
 ];
 ?>
@@ -30,7 +31,7 @@ $menu = [
     <link rel="stylesheet" href="<?= View::url('/assets/css/admin.css') ?>">
     <script src="<?= View::url('/assets/js/admin.js') ?>" defer></script>
 </head>
-<body class="adm">
+<body class="adm<?= $seccion === 'configuracion' ? ' adm-config' : '' ?>">
 <header class="adm-header">
     <a class="adm-brand" href="<?= View::url('/admin') ?>">BiblioTech</a>
     <nav class="adm-topnav" aria-label="Navegación principal">

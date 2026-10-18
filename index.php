@@ -57,14 +57,17 @@ $router->post('/login', [$auth, 'login']);
 $router->get('/register', [$auth, 'showRegister']);
 $router->post('/register', [$auth, 'register']);
 $router->post('/logout', [$auth, 'logout']);
-$router->get('/bibliotecario', static fn () => $dashboard->show('bibliotecario'));
 $router->get('/home', [$dashboard, 'showHome']);
 $router->get('/catalogo', [$catalogo, 'index']);
+$router->get('/catalogo/show', [$catalogo, 'show']);
 $router->get('/mis-reservas', [$reservas, 'index']);
 $router->post('/reservas/crear', [$reservas, 'crear']);
 $router->post('/reservas/cancelar', [$reservas, 'cancelar']);
 $router->get('/mis-multas', [$multas, 'index']);
 $router->post('/mis-multas/pagar', [$multas, 'pagar']);
+
+// Módulo Bibliotecario (préstamos, reservas, multas y catálogo de solo lectura).
+require __DIR__ . '/app/Routes/bibliotecario.php';
 
 // Módulo Administrador (dashboard, libros, categorías, usuarios, préstamos, reservas y multas).
 require __DIR__ . '/app/Routes/admin.php';

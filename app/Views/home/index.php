@@ -7,6 +7,12 @@ $escape = static fn (string $value): string => htmlspecialchars($value, ENT_QUOT
 $userName = is_array($_SESSION['user'] ?? null)
     ? (string) ($_SESSION['user']['nombre'] ?? '')
     : '';
+$userRole = is_array($_SESSION['user'] ?? null)
+    ? (string) ($_SESSION['user']['rol'] ?? '')
+    : '';
+$homePath = $userRole === 'bibliotecario' ? '/bibliotecario' : '/home';
+$catalogPath = $userRole === 'bibliotecario' ? '/bibliotecario/libros' : '/catalogo';
+$catalogLabel = $userRole === 'bibliotecario' ? 'Ver catálogo' : 'Comenzar Ahora';
 ?>
 <!doctype html>
 <html lang="es">
@@ -20,16 +26,21 @@ $userName = is_array($_SESSION['user'] ?? null)
 <body>
 <header class="site-header">
     <div class="header-inner">
-        <a class="brand" href="<?= $escape(Url::to('/home')) ?>" aria-label="BiblioTech, inicio">BiblioTech</a>
+        <a class="brand" href="<?= $escape(Url::to($homePath)) ?>" aria-label="BiblioTech, inicio">BiblioTech</a>
 
         <nav class="main-nav" aria-label="Navegación principal">
-            <a class="nav-link active" href="<?= $escape(Url::to('/home')) ?>" aria-current="page">Inicio</a>
-            <?php if (($_SESSION['user']['rol'] ?? '') === 'estudiante'): ?>
+            <a class="nav-link active" href="<?= $escape(Url::to($homePath)) ?>" aria-current="page">Inicio</a>
+            <?php if ($userRole === 'bibliotecario'): ?>
+                <a class="nav-link" href="<?= $escape(Url::to('/bibliotecario/libros')) ?>">Libros</a>
+                <a class="nav-link" href="<?= $escape(Url::to('/bibliotecario/prestamos')) ?>">Préstamos</a>
+                <a class="nav-link" href="<?= $escape(Url::to('/bibliotecario/reservas')) ?>">Reservas</a>
+                <a class="nav-link" href="<?= $escape(Url::to('/bibliotecario/multas')) ?>">Multas</a>
+            <?php elseif ($userRole === 'estudiante'): ?>
                 <a class="nav-link" href="<?= $escape(Url::to('/catalogo')) ?>">Catálogo</a>
                 <a class="nav-link" href="<?= $escape(Url::to('/mis-reservas')) ?>">Mis reservas</a>
                 <a class="nav-link" href="<?= $escape(Url::to('/mis-multas')) ?>">Mis multas</a>
             <?php endif; ?>
-            <?php if (($_SESSION['user']['rol'] ?? '') === 'administrador'): ?>
+            <?php if ($userRole === 'administrador'): ?>
                 <a class="nav-link" href="<?= $escape(Url::to('/admin')) ?>">Admin</a>
             <?php endif; ?>
         </nav>
@@ -50,7 +61,7 @@ $userName = is_array($_SESSION['user'] ?? null)
             <p class="hero-kicker">Tu biblioteca, más cerca</p>
             <h1 id="hero-title">Plataforma <span>BiblioTech</span></h1>
             <p class="hero-subtitle">Solución tecnológica desarrollada sobre entorno LAMP.</p>
-            <a class="primary-button" href="<?= $escape(Url::to('/catalogo')) ?>">Comenzar Ahora</a>
+            <a class="primary-button" href="<?= $escape(Url::to($catalogPath)) ?>"><?= $escape($catalogLabel) ?></a>
         </div>
         <div class="hero-decoration" aria-hidden="true">
             <span class="decoration-orbit orbit-one"></span>

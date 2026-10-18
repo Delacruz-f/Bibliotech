@@ -6,6 +6,7 @@ namespace App\Controllers\Admin;
 use App\Core\Flash;
 use App\Core\Paginator;
 use App\Core\View;
+use App\Models\Configuracion;
 use App\Models\Libro;
 use App\Models\Prestamo;
 use App\Models\UsuarioAdmin;
@@ -35,7 +36,7 @@ final class PrestamoController extends BaseController
 
     public function crear(): void
     {
-        $this->formulario(['id_usuario' => '', 'id_libro' => '', 'dias' => (string) Circulacion::DIAS_PRESTAMO]);
+        $this->formulario(['id_usuario' => '', 'id_libro' => '']);
     }
 
     public function guardar(): void
@@ -44,18 +45,13 @@ final class PrestamoController extends BaseController
         $v = [
             'id_usuario' => $this->texto('id_usuario'),
             'id_libro' => $this->texto('id_libro'),
-            'dias' => $this->texto('dias'),
         ];
-        $dias = ctype_digit($v['dias']) ? (int) $v['dias'] : 0;
 
         try {
             if (!ctype_digit($v['id_usuario']) || !ctype_digit($v['id_libro'])) {
                 throw new DomainException('Selecciona un usuario y un libro.');
             }
-            if ($dias < 1 || $dias > 60) {
-                throw new DomainException('Los días de préstamo deben estar entre 1 y 60.');
-            }
-            (new Circulacion())->registrarPrestamo((int) $v['id_usuario'], (int) $v['id_libro'], $dias);
+            (new Circulacion())->registrarPrestamo((int) $v['id_usuario'], (int) $v['id_libro']);
         } catch (DomainException $e) {
             http_response_code(422);
             $this->formulario($v, $e->getMessage());
@@ -89,6 +85,7 @@ final class PrestamoController extends BaseController
             'error' => $error,
             'estudiantes' => (new UsuarioAdmin())->activosPorRol('estudiante'),
             'libros' => (new Libro())->disponibles(),
+            'diasPrestamo' => (new Configuracion())->obtenerTodas()['dias_prestamo'],
         ]);
     }
 }

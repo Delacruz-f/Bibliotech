@@ -12,27 +12,39 @@ final class CatalogoController
 {
     public function index(): void
     {
-        $this->requireStudent();
         $requestedPage = filter_input(INPUT_GET, 'pagina', FILTER_VALIDATE_INT);
         $pageData = (new Libro())->obtenerTodos(max(1, $requestedPage === false || $requestedPage === null ? 1 : $requestedPage));
         $flash = Flash::consume();
         $csrfToken = Csrf::token();
+        $canReserve = $this->isStudent();
         $pageTitle = 'Catálogo de libros';
 
         require dirname(__DIR__) . '/Views/estudiante/catalogo.php';
     }
 
-    private function requireStudent(): void
+    public function show(): void
     {
-        $user = $_SESSION['user'] ?? null;
-        if (!is_array($user) || !isset($user['id']) || (int) $user['id'] < 1) {
-            header('Location: ' . Url::to('/login'));
-            exit;
+        $requestedId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+        $bookId = $requestedId === false || $requestedId === null ? 0 : $requestedId;
+        $libro = $bookId > 0 ? (new Libro())->detalle($bookId) : null;
+        if ($libro === null) {
+            http_response_code(404);
         }
 
-        if (($user['rol'] ?? '') !== 'estudiante') {
-            header('Location: ' . Url::to('/home'));
-            exit;
-        }
+        $canReserve = $this->isStudent();
+        $csrfToken = Csrf::token();
+        $pageTitle = $libro === null ? 'Libro no encontrado' : (string) $libro['titulo'];
+
+        require dirname(__DIR__) . '/Views/estudiante/libro.php';
+    }
+
+    private function isStudent(): bool
+    {
+        $user = $_SESSION['user'] ?? null;
+
+        return is_array($user)
+            && isset($user['id'])
+            && (int) $user['id'] > 0
+            && ($user['rol'] ?? '') === 'estudiante';
     }
 }

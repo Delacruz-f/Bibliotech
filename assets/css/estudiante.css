@@ -101,6 +101,10 @@ body {
     white-space: nowrap;
 }
 
+.student-account > a {
+    text-decoration: none;
+}
+
 .student-account form {
     margin: 0;
 }
@@ -291,33 +295,140 @@ body {
 }
 
 .book-details {
+    display: block;
     width: 100%;
     margin-top: auto;
     padding-top: 18px;
-    text-align: right;
-}
-
-.book-details summary {
     color: var(--purple);
-    cursor: pointer;
     font-size: 0.9rem;
     font-weight: 700;
-    list-style: none;
+    text-align: right;
+    text-decoration: none;
 }
 
-.book-details summary::-webkit-details-marker {
-    display: none;
-}
-
-.book-details summary span {
+.book-details span {
     color: #9a762f;
 }
 
-.book-details p {
+.book-details:hover {
+    text-decoration: underline;
+}
+
+.reservation-hint {
+    margin: 12px 0 0;
     color: var(--muted);
-    font-size: 0.86rem;
+    font-size: 0.82rem;
     line-height: 1.5;
+}
+
+.detail-back {
+    margin: 0 0 24px;
+}
+
+.detail-back a {
+    color: var(--purple);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.detail-back a:hover {
+    text-decoration: underline;
+}
+
+.book-detail {
+    display: grid;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    grid-template-columns: minmax(240px, 0.8fr) minmax(0, 1.2fr);
+    background: #fff;
+    box-shadow: 0 10px 30px rgb(58 37 57 / 7%);
+}
+
+.book-detail-cover {
+    display: grid;
+    min-height: 440px;
+    padding: 28px;
+    background: linear-gradient(145deg, #f1e9f0, #fdf4d9);
+    place-items: center;
+}
+
+.book-detail-cover img {
+    width: min(100%, 300px);
+    max-height: 420px;
+    object-fit: contain;
+    filter: drop-shadow(0 12px 16px rgb(42 23 41 / 18%));
+}
+
+.book-detail-content {
+    padding: clamp(24px, 5vw, 52px);
+}
+
+.book-detail-content h1 {
+    margin: 0 0 8px;
+    color: var(--purple-dark);
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    letter-spacing: -0.04em;
+    line-height: 1.15;
+}
+
+.book-detail-content > .book-author {
+    margin-bottom: 18px;
+    font-size: 1rem;
+}
+
+.book-synopsis {
+    margin-top: 28px;
+}
+
+.book-synopsis h2 {
+    margin: 0 0 8px;
+    color: var(--purple);
+    font-size: 1.1rem;
+}
+
+.book-synopsis p {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.7;
+}
+
+.book-metadata {
+    display: grid;
+    margin: 28px 0 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.book-metadata div {
+    min-width: 0;
+}
+
+.book-metadata dt {
+    margin-bottom: 5px;
+    color: var(--muted);
+    font-size: 0.78rem;
+}
+
+.book-metadata dd {
+    margin: 0;
+    color: var(--ink);
+    font-size: 0.9rem;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.detail-reserve {
+    margin-top: 26px;
     text-align: left;
+}
+
+.detail-reserve .button {
+    min-width: 175px;
+}
+
+.inline-button {
+    margin-top: 14px;
 }
 
 .reserve-form {
@@ -716,6 +827,27 @@ summary:focus-visible {
     .book-grid {
         grid-template-columns: 1fr;
         gap: 17px;
+    }
+
+    .book-detail {
+        grid-template-columns: 1fr;
+    }
+
+    .book-detail-cover {
+        min-height: 300px;
+    }
+
+    .book-detail-cover img {
+        max-height: 280px;
+    }
+
+    .book-detail-content {
+        padding: 25px 20px;
+    }
+
+    .book-metadata {
+        grid-template-columns: 1fr;
+        gap: 14px;
     }
 
     .book-cover {

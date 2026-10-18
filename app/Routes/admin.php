@@ -8,6 +8,7 @@ declare(strict_types=1);
  */
 
 use App\Controllers\Admin\CategoriaController;
+use App\Controllers\Admin\ConfiguracionController;
 use App\Controllers\Admin\DashboardController;
 use App\Controllers\Admin\LibroController;
 use App\Controllers\Admin\MultaController;
@@ -18,6 +19,8 @@ use App\Controllers\Admin\UsuarioController;
 /** @var App\Core\Router $router */
 
 $router->get('/admin', static fn () => (new DashboardController())->index());
+$router->get('/admin/configuracion', static fn () => (new ConfiguracionController())->index());
+$router->post('/admin/configuracion/guardar', static fn () => (new ConfiguracionController())->guardar());
 
 $router->get('/admin/libros', static fn () => (new LibroController())->index());
 $router->get('/admin/libros/crear', static fn () => (new LibroController())->crear());

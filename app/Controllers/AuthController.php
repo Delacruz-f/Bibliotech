@@ -181,7 +181,12 @@ final class AuthController
             $this->redirect('/login');
         }
 
-        $this->redirect($role === 'administrador' ? '/admin' : '/home');
+        $destinations = [
+            'administrador' => '/admin',
+            'bibliotecario' => '/bibliotecario',
+            'estudiante' => '/home',
+        ];
+        $this->redirect($destinations[$role]);
     }
 
     private function redirect(string $path): void

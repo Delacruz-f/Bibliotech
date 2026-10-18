@@ -7,6 +7,7 @@ use App\Core\View;
 /** @var string|null $error */
 /** @var list<array<string, mixed>> $estudiantes */
 /** @var list<array<string, mixed>> $libros */
+/** @var string $diasPrestamo */
 /** @var string $csrf */
 ?>
 <div class="adm-head">
@@ -40,9 +41,7 @@ use App\Core\View;
             <?php endforeach; ?>
         </select>
     </label>
-    <label>Días de préstamo
-        <input name="dias" type="number" min="1" max="60" value="<?= View::e($v['dias']) ?>" required>
-    </label>
+    <p class="span2 adm-hint">Duración configurada: <?= View::e($diasPrestamo) ?> días.</p>
     <div class="span2 adm-form-actions">
         <button class="adm-btn" type="submit">Registrar préstamo</button>
         <a class="adm-btn adm-btn-ghost" href="<?= View::url('/admin/prestamos') ?>">Cancelar</a>

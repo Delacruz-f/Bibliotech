@@ -5,6 +5,8 @@ namespace App\Models;
 
 use App\Core\Database;
 use PDO;
+use DomainException;
+use Throwable;
 
 final class Reserva
 {
@@ -49,9 +51,42 @@ final class Reserva
 
     public function crear(int $id_usuario, int $id_libro): bool
     {
+        $configuracion = (new Configuracion($this->db))->obtenerTodas();
         $this->db->beginTransaction();
 
         try {
+            $user = $this->db->prepare('SELECT estado FROM usuarios WHERE id = :id_usuario FOR UPDATE');
+            $user->execute(['id_usuario' => $id_usuario]);
+            $estadoUsuario = $user->fetchColumn();
+            if ($estadoUsuario === false || $estadoUsuario !== 'activo') {
+                throw new DomainException('El usuario está bloqueado y no puede reservar libros.');
+            }
+
+            $expire = $this->db->prepare(
+                "UPDATE reservas SET estado = 'expirada'
+                 WHERE id_usuario = :id_usuario AND estado = 'pendiente' AND fecha_expiracion <= NOW()"
+            );
+            $expire->execute(['id_usuario' => $id_usuario]);
+
+            $pendingFines = $this->db->prepare(
+                "SELECT COUNT(*) FROM multas m
+                 INNER JOIN prestamos p ON p.id = m.id_prestamo
+                 WHERE p.id_usuario = :id_usuario AND m.estado = 'pendiente'"
+            );
+            $pendingFines->execute(['id_usuario' => $id_usuario]);
+            if ($configuracion['bloquear_multas_pendientes'] === '1' && (int) $pendingFines->fetchColumn() > 0) {
+                throw new DomainException('Tienes multas pendientes y no puedes crear reservas.');
+            }
+
+            $activeReservations = $this->db->prepare(
+                "SELECT COUNT(*) FROM reservas
+                 WHERE id_usuario = :id_usuario AND estado = 'pendiente'"
+            );
+            $activeReservations->execute(['id_usuario' => $id_usuario]);
+            if ((int) $activeReservations->fetchColumn() >= (int) $configuracion['max_reservas_activas']) {
+                throw new DomainException('Alcanzaste el máximo de reservas activas permitido.');
+            }
+
             $book = $this->db->prepare(
                 'SELECT stock_disponible FROM libros WHERE id = :id_libro FOR UPDATE'
             );
@@ -63,11 +98,12 @@ final class Reserva
                 return false;
             }
 
+            $hours = max(1, min(720, (int) $configuracion['horas_vigencia_reserva']));
             $reservation = $this->db->prepare(
                 'INSERT INTO reservas
                     (id_usuario, id_libro, fecha_reserva, fecha_expiracion, estado)
                  VALUES
-                    (:id_usuario, :id_libro, NOW(), DATE_ADD(NOW(), INTERVAL 48 HOUR), :estado)'
+                    (:id_usuario, :id_libro, NOW(), DATE_ADD(NOW(), INTERVAL ' . $hours . ' HOUR), :estado)'
             );
             $reservation->execute([
                 'id_usuario' => $id_usuario,
@@ -77,7 +113,7 @@ final class Reserva
             $this->db->commit();
 
             return true;
-        } catch (\Throwable $exception) {
+        } catch (Throwable $exception) {
             if ($this->db->inTransaction()) {
                 $this->db->rollBack();
             }

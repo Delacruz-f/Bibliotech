@@ -10,6 +10,7 @@ Sistema de biblioteca en **PHP puro** (sin framework) con MySQL/MariaDB. Se ejec
    `admin@`, `biblio@`, `ana@`, `luis@`, `carla@` + `bibliotech.test`.
 4. Ajusta la conexión con las variables de entorno `DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`
    (valores por defecto en `app/Core/Database.php`).
+5. Si la base ya existía antes del módulo de configuración, importa `database/migracion_configuraciones.sql`.
 
 ## Estructura
 
@@ -30,6 +31,7 @@ database/                      Esquema y datos demo
 | Sección | Ruta | Requerimientos |
 |---|---|---|
 | Dashboard | `/admin` | RF23–RF27 |
+| Configuración | `/admin/configuracion` | Reglas de circulación |
 | Libros | `/admin/libros` | RF06, RF07 |
 | Categorías | `/admin/categorias` | RF08 |
 | Usuarios | `/admin/usuarios` | RF03–RF05 |
@@ -39,9 +41,21 @@ database/                      Esquema y datos demo
 
 Todas las rutas exigen sesión con rol `administrador` (`BaseController`) y los formularios POST validan el token CSRF.
 
+La configuración se guarda en MySQL en la tabla `configuraciones` (clave-valor). El formulario limita los préstamos a 1–60 días, los máximos a 1–99, la vigencia de reservas a 1–720 horas, la mora a S/ 0.01–1,000.00 y los días de gracia a 0–60. Los cambios rigen en nuevos préstamos/reservas y devoluciones procesadas después del cambio.
+
+## Módulo Bibliotecario (`/bibliotecario`)
+
+El rol bibliotecario cuenta con catálogo de solo lectura, gestión de préstamos y devoluciones, confirmación de reservas para generar préstamos y registro de pagos de multas. Las reglas de plazo, límites y mora proceden de la configuración del sistema. Las rutas están en `app/Routes/bibliotecario.php`, cargadas desde `index.php`; cada controlador exige sesión con rol `bibliotecario` y valida CSRF en las acciones POST. No se exponen operaciones para administrar usuarios/categorías ni para borrar libros o historial.
+
+## Catálogo público
+
+El catálogo está disponible sin iniciar sesión en `/catalogo`, y cada libro tiene una ficha pública en `/catalogo/show?id=<id>`. Los visitantes pueden consultar disponibilidad y detalles; solo los usuarios autenticados con rol de estudiante pueden crear reservas.
+
 ## Reglas de circulación (`Circulacion`)
 
-- Préstamo por defecto: **7 días**. Multa: **S/ 1.50 por día de atraso** (S/ 9.00 por 6 días), generada al devolver.
+- Valores iniciales configurables: préstamo de **14 días**, mora de **S/ 0.20 por día**, sin días de gracia, hasta **3 préstamos** y **3 reservas** activas por estudiante, y reservas vigentes por **48 horas**.
+- El formulario de reserva impide exceder el máximo activo y aplica el plazo configurado; el cálculo de mora resta los días de gracia y usa la tarifa vigente al procesar la devolución.
+- Si está habilitada la opción de bloqueo, un usuario con multas pendientes no puede crear reservas ni recibir préstamos (incluidas las reservas confirmadas por el bibliotecario).
 - El stock se descuenta al prestar y se repone al devolver. Reservar **no** descuenta stock; sí lo hace confirmar la entrega.
 - Reservas pendientes pasan a `expirada` y préstamos activos a `vencido` automáticamente al abrir las pantallas de circulación.
 - La clase no depende del rol: el módulo **Bibliotecario** puede reutilizarla (`registrarPrestamo`, `registrarDevolucion`, `confirmarReserva`, `pagarMulta`, ...).

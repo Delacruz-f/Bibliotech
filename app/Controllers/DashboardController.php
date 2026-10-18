@@ -46,6 +46,13 @@ final class DashboardController
             $this->redirect('/login');
         }
 
+        if ($user['rol'] === 'administrador') {
+            $this->redirect('/admin');
+        }
+        if ($user['rol'] === 'bibliotecario') {
+            $this->redirect('/bibliotecario');
+        }
+
         $csrfToken = Csrf::token();
         require dirname(__DIR__) . '/Views/home/index.php';
     }

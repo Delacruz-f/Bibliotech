@@ -40,6 +40,7 @@ $escape = static fn (string $value): string => htmlspecialchars($value, ENT_QUOT
             <button class="button" type="submit">Iniciar sesión</button>
         </form>
         <p class="form-footer">¿Aún no tienes cuenta? <a href="<?= $escape(Url::to('/register')) ?>">Regístrate</a></p>
+        <p class="form-footer">¿Solo quieres explorar? <a href="<?= $escape(Url::to('/catalogo')) ?>">Consulta el catálogo público</a></p>
     </section>
 </main>
 </body>

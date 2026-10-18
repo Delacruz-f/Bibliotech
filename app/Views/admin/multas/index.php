@@ -14,7 +14,7 @@ use App\Core\View;
 <div class="adm-head">
     <div>
         <h1 class="adm-title">Multas</h1>
-        <p class="adm-subtitle">Se generan al devolver con atraso: S/ 9.00 por cada 6 días (S/ 1.50 por día)</p>
+        <p class="adm-subtitle">Se generan al devolver un préstamo fuera del plazo configurado.</p>
     </div>
 </div>
 
