@@ -1,8 +1,8 @@
 <?php
 declare(strict_types=1);
 
-use App\Controllers\Bibliotecario\LibroController;
 use App\Controllers\Bibliotecario\InicioController;
+use App\Controllers\Bibliotecario\LibroController;
 use App\Controllers\Bibliotecario\MultaController;
 use App\Controllers\Bibliotecario\PrestamoController;
 use App\Controllers\Bibliotecario\ReservaController;

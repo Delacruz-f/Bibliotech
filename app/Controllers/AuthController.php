@@ -12,11 +12,13 @@ final class AuthController
 {
     public function index(): void
     {
-        if (!isset($_SESSION['user'])) {
-            $this->redirect('/login');
+        if (isset($_SESSION['user'])) {
+            $this->redirectForRole((string) ($_SESSION['user']['rol'] ?? ''));
         }
 
-        $this->redirectForRole((string) ($_SESSION['user']['rol'] ?? ''));
+        $this->render('home/index', [
+            'csrfToken' => Csrf::token(),
+        ]);
     }
 
     public function showLogin(): void

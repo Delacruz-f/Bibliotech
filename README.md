@@ -45,11 +45,11 @@ La configuración se guarda en MySQL en la tabla `configuraciones` (clave-valor)
 
 ## Módulo Bibliotecario (`/bibliotecario`)
 
-El rol bibliotecario cuenta con catálogo de solo lectura, gestión de préstamos y devoluciones, confirmación de reservas para generar préstamos y registro de pagos de multas. Las reglas de plazo, límites y mora proceden de la configuración del sistema. Las rutas están en `app/Routes/bibliotecario.php`, cargadas desde `index.php`; cada controlador exige sesión con rol `bibliotecario` y valida CSRF en las acciones POST. No se exponen operaciones para administrar usuarios/categorías ni para borrar libros o historial.
+Al iniciar sesión con el rol bibliotecario, `/bibliotecario` muestra la página de inicio y conserva sus módulos de catálogo, gestión de préstamos y devoluciones, confirmación de reservas para generar préstamos y registro de pagos de multas. Las rutas del panel están en `app/Routes/bibliotecario.php`, cargadas desde `index.php`; cada controlador exige sesión con rol `bibliotecario` y valida CSRF en las acciones POST.
 
 ## Catálogo público
 
-El catálogo está disponible sin iniciar sesión en `/catalogo`, y cada libro tiene una ficha pública en `/catalogo/show?id=<id>`. Los visitantes pueden consultar disponibilidad y detalles; solo los usuarios autenticados con rol de estudiante pueden crear reservas.
+La página de bienvenida con enlaces para iniciar sesión y registrarse se muestra al abrir la aplicación. El catálogo está disponible sin iniciar sesión en `/catalogo`, y cada libro tiene una ficha pública en `/catalogo/show?id=<id>`. Los visitantes pueden consultar disponibilidad y detalles; solo los usuarios autenticados con rol de estudiante pueden crear reservas.
 
 ## Reglas de circulación (`Circulacion`)
 

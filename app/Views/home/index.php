@@ -10,9 +10,9 @@ $userName = is_array($_SESSION['user'] ?? null)
 $userRole = is_array($_SESSION['user'] ?? null)
     ? (string) ($_SESSION['user']['rol'] ?? '')
     : '';
-$homePath = $userRole === 'bibliotecario' ? '/bibliotecario' : '/home';
+$homePath = $userRole === 'bibliotecario' ? '/bibliotecario' : ($userRole === '' ? '/' : '/home');
 $catalogPath = $userRole === 'bibliotecario' ? '/bibliotecario/libros' : '/catalogo';
-$catalogLabel = $userRole === 'bibliotecario' ? 'Ver catálogo' : 'Comenzar Ahora';
+$catalogLabel = $userRole === 'estudiante' ? 'Comenzar Ahora' : 'Ver catálogo';
 ?>
 <!doctype html>
 <html lang="es">
@@ -39,6 +39,8 @@ $catalogLabel = $userRole === 'bibliotecario' ? 'Ver catálogo' : 'Comenzar Ahor
                 <a class="nav-link" href="<?= $escape(Url::to('/catalogo')) ?>">Catálogo</a>
                 <a class="nav-link" href="<?= $escape(Url::to('/mis-reservas')) ?>">Mis reservas</a>
                 <a class="nav-link" href="<?= $escape(Url::to('/mis-multas')) ?>">Mis multas</a>
+            <?php elseif ($userRole === ''): ?>
+                <a class="nav-link" href="<?= $escape(Url::to('/catalogo')) ?>">Catálogo</a>
             <?php endif; ?>
             <?php if ($userRole === 'administrador'): ?>
                 <a class="nav-link" href="<?= $escape(Url::to('/admin')) ?>">Admin</a>
@@ -46,11 +48,16 @@ $catalogLabel = $userRole === 'bibliotecario' ? 'Ver catálogo' : 'Comenzar Ahor
         </nav>
 
         <div class="account-actions">
-            <span class="user-name"><?= $escape($userName) ?></span>
-            <form action="<?= $escape(Url::to('/logout')) ?>" method="post">
-                <input type="hidden" name="_csrf_token" value="<?= $escape($csrfToken) ?>">
-                <button class="logout-button" type="submit">Salir</button>
-            </form>
+            <?php if ($userRole !== ''): ?>
+                <span class="user-name"><?= $escape($userName) ?></span>
+                <form action="<?= $escape(Url::to('/logout')) ?>" method="post">
+                    <input type="hidden" name="_csrf_token" value="<?= $escape($csrfToken) ?>">
+                    <button class="logout-button" type="submit">Salir</button>
+                </form>
+            <?php else: ?>
+                <a class="nav-link" href="<?= $escape(Url::to('/login')) ?>">Iniciar sesión</a>
+                <a class="logout-button" href="<?= $escape(Url::to('/register')) ?>">Registrarse</a>
+            <?php endif; ?>
         </div>
     </div>
 </header>
